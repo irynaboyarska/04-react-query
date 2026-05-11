@@ -1,7 +1,8 @@
 import SearchBar from "../SearchBar/SearchBar";
 import css from "./App.module.css";
 import fetchMovies from "../../services/movieService";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import toast, { Toaster } from "react-hot-toast";
 import type { Movie } from "../../types/movie";
 import MovieGrid from "../MovieGrid/MovieGrid";
 import MovieModal from "../MovieModal/MovieModal";
@@ -25,6 +26,12 @@ const App = () => {
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
 
+  useEffect(() => {
+    if (data?.results.length === 0) {
+      toast("No movies found for your request.");
+    }
+  });
+
   const { data, isLoading, isError, isSuccess } = useQuery({
     queryKey: ["movies", query, page],
     queryFn: () => fetchMovies(query, page),
@@ -41,6 +48,7 @@ const App = () => {
 
   return (
     <div className={css.app}>
+      <Toaster />
       <SearchBar onSubmit={handleSearch} />
       {isSuccess && totalPages > 1 && (
         <ReactPaginate
